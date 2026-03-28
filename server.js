@@ -1,6 +1,6 @@
 app.get("/", (req, res) => {
   res.send("Niva Care Server is Running 🚀");
-});
+}); 
 const express = require("express");
 const cors = require("cors");
 
