@@ -1,7 +1,6 @@
 {
   "name": "niva-care-system",
   "version": "1.0.0",
-  "description": "Care Watch Server",
   "main": "Server.js",
   "scripts": {
     "start": "node Server.js"
