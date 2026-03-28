@@ -5,23 +5,52 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===== IN-MEMORY DATABASE =====
+// ===== DATABASE (temporary memory) =====
 let medications = [
-  { time: "09:00", name: "Paracetamol" }
+  { name: "Paracetamol", time: "09:00" }
 ];
 
 let history = [];
-let emergencyAlerts = [];
+let alerts = [];
 let lastSeen = null;
 
-// ===== ROUTES =====
+// ===== ROOT =====
+app.get("/", (req, res) => {
+  res.send("Niva Care Server Running 🚀");
+});
 
-// Get medication schedule
+// ===== MEDICATION =====
+
+// Get all meds
 app.get("/getMedication", (req, res) => {
   res.json(medications);
 });
 
-// Log medication taken
+// Add medication
+app.post("/addMedication", (req, res) => {
+  const { name, time } = req.body;
+
+  if (!name || !time) {
+    return res.status(400).json({ error: "Missing data" });
+  }
+
+  medications.push({ name, time });
+
+  res.json({ status: "added" });
+});
+
+// Delete medication
+app.post("/deleteMedication", (req, res) => {
+  const { index } = req.body;
+
+  medications.splice(index, 1);
+
+  res.json({ status: "deleted" });
+});
+
+// ===== HISTORY =====
+
+// Log taken
 app.post("/taken", (req, res) => {
   const { name, time } = req.body;
 
@@ -39,27 +68,31 @@ app.get("/history", (req, res) => {
   res.json(history);
 });
 
-// Emergency alert
+// ===== EMERGENCY =====
+
+// Trigger alert
 app.post("/emergency", (req, res) => {
-  emergencyAlerts.push({
+  alerts.push({
     time: new Date()
   });
 
   res.json({ status: "alert received" });
 });
 
-// Get emergency alerts
+// Get alerts
 app.get("/alerts", (req, res) => {
-  res.json(emergencyAlerts);
+  res.json(alerts);
 });
 
-// Watch heartbeat
+// ===== STATUS =====
+
+// Heartbeat
 app.post("/heartbeat", (req, res) => {
   lastSeen = new Date();
   res.json({ status: "alive" });
 });
 
-// Watch status
+// Online/offline
 app.get("/status", (req, res) => {
   if (!lastSeen) return res.json({ status: "offline" });
 
@@ -69,10 +102,10 @@ app.get("/status", (req, res) => {
     status: diff < 10 ? "online" : "offline"
   });
 });
-app.get("/", (req, res) => {
-  res.send("Niva Care Server is Running 🚀");
-}); 
-// ===== START SERVER =====
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+
+// ===== START =====
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
