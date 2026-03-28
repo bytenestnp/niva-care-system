@@ -1,6 +1,3 @@
-app.get("/", (req, res) => {
-  res.send("Niva Care Server is Running 🚀");
-}); 
 const express = require("express");
 const cors = require("cors");
 
@@ -72,7 +69,9 @@ app.get("/status", (req, res) => {
     status: diff < 10 ? "online" : "offline"
   });
 });
-
+app.get("/", (req, res) => {
+  res.send("Niva Care Server is Running 🚀");
+}); 
 // ===== START SERVER =====
 app.listen(3000, () => {
   console.log("Server running on port 3000");
